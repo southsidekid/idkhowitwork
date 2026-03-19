@@ -1,0 +1,5 @@
+[2026-03-19 19:50:13.357] [INFO] Старт теста логгера
+[2026-03-19 19:50:13.358] [PING] PING host=example.com seq=1
+[2026-03-19 19:50:13.358] [TIMEOUT] TIMEOUT host=example.com seq=2
+[2026-03-19 19:50:13.358] [ERROR] ERROR код=500
+[2026-03-19 19:50:13.358] [STATS] STATS sent=3 received=2 lost=1
