@@ -89,23 +89,28 @@ static int my_log(PingLogger *logger, LogLevel level, const char *log_entry) {
         return 0; // фильтр: “ничего не делаем”
     }
 
-    // Open(log); write; close (как по блок-схеме)
-    int rv = 0; // rv: 0 = успех, rv != 0 = ошибка
+    // Open(log); rv; (ветвление по rv); print("log"...) как на блок-схеме.
+    // rv: 0 = success, rv != 0 = failure
+    int rv = 0;
+
     if (logger->file_output) {
         FILE *f = fopen(logger->filename, "a");
         if (!f) {
             rv = -1;
         } else {
+            rv = 0;
             fprintf(f, "%s\n", log_entry);
             fflush(f);
             fclose(f);
-            rv = 0;
         }
     }
 
-    // print("log"...)
+    // print("log"...): делаем как fallback при Open(log) неуспешном (rv != 0).
+    // Если файл вообще не включён — печатаем при console_output.
     if (logger->console_output) {
-        printf("%s\n", log_entry);
+        if (!logger->file_output || rv != 0) {
+            printf("%s\n", log_entry);
+        }
     }
 
     return rv;
