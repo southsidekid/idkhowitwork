@@ -89,14 +89,9 @@ static int my_log(PingLogger *logger, LogLevel level, const char *log_entry) {
         return 0; // фильтр: “ничего не делаем”
     }
 
-    // print("log"...)
-    if (logger->console_output) {
-        printf("%s\n", log_entry);
-    }
-
-    // Open(log); write; close
+    // Open(log); write; close (как по блок-схеме)
+    int rv = 0; // rv: 0 = успех, rv != 0 = ошибка
     if (logger->file_output) {
-        int rv = 0; // rv: 0 = успех, rv != 0 = ошибка
         FILE *f = fopen(logger->filename, "a");
         if (!f) {
             rv = -1;
@@ -104,18 +99,16 @@ static int my_log(PingLogger *logger, LogLevel level, const char *log_entry) {
             fprintf(f, "%s\n", log_entry);
             fflush(f);
             fclose(f);
+            rv = 0;
         }
-
-        // IF rv = 0 (зачёркнут) ... сделаем безопасно:
-        // если rv != 0 — печатаем ошибку (ASCII), но не падаем.
-        if (rv != 0 && logger->console_output) {
-            printf("[ERROR] [LOGGER] Open(log) failed (rv=%d) file=%s\n", rv, logger->filename);
-        }
-
-        return rv;
     }
 
-    return 0;
+    // print("log"...)
+    if (logger->console_output) {
+        printf("%s\n", log_entry);
+    }
+
+    return rv;
 }
 
 void ping_log(PingLogger *logger, LogLevel level, const char *format, ...) {
